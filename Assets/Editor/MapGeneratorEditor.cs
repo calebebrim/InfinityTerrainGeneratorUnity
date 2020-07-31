@@ -4,8 +4,9 @@ using UnityEngine;
 
 [CustomEditor (typeof (MapGenerator))]
 public class MapGeneratorEditor : Editor {
+    public static MapGenerator mapGen;
     public override void OnInspectorGUI () {
-        MapGenerator mapGen = (MapGenerator) target;
+        mapGen = (MapGenerator) target;
 
         if (DrawDefaultInspector ()) {
             if (mapGen.autoUpdate) {
@@ -16,5 +17,20 @@ public class MapGeneratorEditor : Editor {
         if (GUILayout.Button ("Generate")) {
             mapGen.DrawnMapInEditor ();
         }
+    }
+}
+
+[CustomEditor (typeof (MapGenerator))]
+public class OnSave : UnityEditor.AssetModificationProcessor {
+    public static string[] OnWillSaveAssets (string[] paths) {
+        // Get the name of the scene to save.
+        Debug.Log ("Saving");
+        var mapGen = MapGeneratorEditor.mapGen;
+
+        if (mapGen.autoUpdate) {
+            mapGen.DrawnMapInEditor ();
+        }
+
+        return paths;
     }
 }
