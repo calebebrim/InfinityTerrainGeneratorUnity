@@ -18,10 +18,7 @@ public class MapGeneratorEditor : Editor {
             mapGen.DrawnMapInEditor ();
         }
     }
-}
 
-[CustomEditor (typeof (MapGenerator))]
-public class OnSave : UnityEditor.AssetModificationProcessor {
     public static string[] OnWillSaveAssets (string[] paths) {
         // Get the name of the scene to save.
         Debug.Log ("Saving");
@@ -34,3 +31,18 @@ public class OnSave : UnityEditor.AssetModificationProcessor {
         return paths;
     }
 }
+
+// [CustomEditor (typeof (MapGenerator))]
+// public class OnSave : UnityEditor.AssetModificationProcessor, Editor {
+//     public static string[] OnWillSaveAssets (string[] paths) {
+//         // Get the name of the scene to save.
+//         Debug.Log ("Saving");
+//         var mapGen = MapGeneratorEditor.mapGen;
+
+//         if (mapGen.autoUpdate) {
+//             mapGen.DrawnMapInEditor ();
+//         }
+
+//         return paths;
+//     }
+// }

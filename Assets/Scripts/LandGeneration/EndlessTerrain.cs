@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 public class EndlessTerrain : MonoBehaviour {
+    const float scale = 5f;
     const float viewerMoveThresholdChunkUpdate = 25f;
     const float sqrtViewerMoveThresholdChunkUpdate = viewerMoveThresholdChunkUpdate * viewerMoveThresholdChunkUpdate;
     public LODInfo[] detailLevels;
@@ -28,7 +29,7 @@ public class EndlessTerrain : MonoBehaviour {
     }
 
     void Update () {
-        viewerPosition = new Vector2 (viewer.position.x, viewer.position.z);
+        viewerPosition = new Vector2 (viewer.position.x, viewer.position.z) / scale;
 
         if ((viewerPositionOld - viewerPosition).sqrMagnitude > sqrtViewerMoveThresholdChunkUpdate) {
             viewerPositionOld = viewerPosition;
@@ -83,10 +84,12 @@ public class EndlessTerrain : MonoBehaviour {
             meshObject = new GameObject ("Terrain Chunk");
             meshRenderer = meshObject.AddComponent<MeshRenderer> ();
             meshFilter = meshObject.AddComponent<MeshFilter> ();
-            meshObject.transform.position = positionV3;
-            meshRenderer.material = material;
-            // meshObject.transform.localScale = Vector3.one * size / 10f;
+
             meshObject.transform.parent = parent;
+            meshObject.transform.position = positionV3 * scale;
+            meshObject.transform.localScale = Vector3.one * scale;
+
+            meshRenderer.material = material;
             setVisible (false);
             lodMeshes = detailLevels.Select (x => new LODMesh (x.lod, updateTerrainChunk)).ToArray ();
             mapGenerator.RequestMapData (position, OnMapDataReceived);

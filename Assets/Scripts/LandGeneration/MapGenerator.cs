@@ -7,7 +7,7 @@ using UnityEngine;
 public class MapGenerator : MonoBehaviour {
 
     public enum DrawnMode { NoiseMap, ColourMap, Mesh }
-
+    public Noise.NormalizedMode normalizedMode;
     public DrawnMode drawnMode;
     public int mapChunkSize = 241;
     [Range (0, 6)]
@@ -95,15 +95,16 @@ public class MapGenerator : MonoBehaviour {
     }
 
     MapData GenerateMapData (Vector2 center) {
-        float[, ] noiseMap = Noise.GeneratedNoiseMap (mapChunkSize, mapChunkSize, noiseScale, seed, octaves, persistance, lacunarity, center + offset);
+        float[, ] noiseMap = Noise.GeneratedNoiseMap (mapChunkSize, mapChunkSize, noiseScale, seed, octaves, persistance, lacunarity, center + offset, normalizedMode);
 
         Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
         for (int y = 0; y < mapChunkSize; y++) {
             for (int x = 0; x < mapChunkSize; x++) {
                 float currentHeight = noiseMap[x, y];
                 for (int i = 0; i < regions.Length; i++) {
-                    if (currentHeight <= regions[i].height) {
+                    if (currentHeight >= regions[i].height) {
                         colourMap[y * mapChunkSize + x] = regions[i].colour;
+                    } else {
                         break;
                     }
                 }
