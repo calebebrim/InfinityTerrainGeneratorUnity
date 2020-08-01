@@ -31,11 +31,19 @@ public class MapGenerator : MonoBehaviour {
         MapDisplay display = FindObjectOfType<MapDisplay> ();
         MapData mapdata = GenerateMapData (Vector2.zero);
         if (drawnMode == DrawnMode.NoiseMap) {
+            Debug.Log ("Drawing Noise");
+            GameObject planeEditor = GameObject.FindObjectOfType<MapDisplay> ().textureRender.gameObject;
+            planeEditor.SetActive (true);
             display.DrawnTexture (TextureGenerator.TextureFromHeightMap (mapdata.heightMap));
-        } else
-        if (drawnMode == DrawnMode.ColourMap) {
+        } else if (drawnMode == DrawnMode.ColourMap) {
+            Debug.Log ("Drawing ColourMap");
+            GameObject planeEditor = GameObject.FindObjectOfType<MapDisplay> ().textureRender.gameObject;
+            planeEditor.SetActive (true);
             display.DrawnTexture (TextureGenerator.TextureFromColourMap (mapdata.colourMap, mapChunkSize, mapChunkSize));
         } else if (drawnMode == DrawnMode.Mesh) {
+            Debug.Log ("Drawing Mesh");
+            GameObject meshEditor = GameObject.FindObjectOfType<MapDisplay> ().meshRenderer.gameObject;
+            meshEditor.SetActive (true);
             display.DrawnMesh (MeshGenerator.GenerateTerrainMesh (mapdata.heightMap, meshHeightMultiplier, meshHeightCurve, editorPreviewLOD), TextureGenerator.TextureFromColourMap (mapdata.colourMap, mapChunkSize, mapChunkSize));
         }
     }
@@ -68,17 +76,21 @@ public class MapGenerator : MonoBehaviour {
     void call<T> (MapThreadInfo<T> threadInfo) {
         threadInfo.callback (threadInfo.parameter);
     }
+
+    void Start () {
+        GameObject planeEditor = GameObject.FindObjectOfType<MapDisplay> ().textureRender.gameObject;
+        GameObject meshEditor = GameObject.FindObjectOfType<MapDisplay> ().meshRenderer.gameObject;
+        planeEditor.SetActive (false);
+        meshEditor.SetActive (false);
+    }
     void Update () {
         var queueSize = mapDataThreadInfoQ.Count;
         for (int i = 0; i < queueSize; i++) {
             call (mapDataThreadInfoQ.Dequeue ());
-
         }
-
         queueSize = meshDataThreadInfoQ.Count;
         for (int i = 0; i < queueSize; i++) {
             call (meshDataThreadInfoQ.Dequeue ());
-
         }
     }
 
