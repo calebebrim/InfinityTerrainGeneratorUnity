@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour {
 
-    public enum DrawnMode { NoiseMap, ColourMap, Mesh }
+    public enum DrawnMode { NoiseMap, ColourMap, Mesh, FallofMap }
     public Noise.NormalizedMode normalizedMode;
     public DrawnMode drawnMode;
     public int mapChunkSize = 241;
@@ -45,6 +45,11 @@ public class MapGenerator : MonoBehaviour {
             GameObject meshEditor = GameObject.FindObjectOfType<MapDisplay> ().meshRenderer.gameObject;
             meshEditor.SetActive (true);
             display.DrawnMesh (MeshGenerator.GenerateTerrainMesh (mapdata.heightMap, meshHeightMultiplier, meshHeightCurve, editorPreviewLOD), TextureGenerator.TextureFromColourMap (mapdata.colourMap, mapChunkSize, mapChunkSize));
+        } else if (drawnMode == DrawnMode.FallofMap) {
+            Debug.Log ("Drawing texture");
+            GameObject planeEditor = GameObject.FindObjectOfType<MapDisplay> ().textureRender.gameObject;
+            planeEditor.SetActive (true);
+            display.DrawnTexture (TextureGenerator.TextureFromHeightMap (FallofGenerator.GenerateFallofMap (mapChunkSize)));
         }
     }
     public void RequestMapData (Vector2 center, Action<MapData> callback) {
