@@ -23,10 +23,15 @@ public class MapGenerator : MonoBehaviour {
     public int seed;
     public Vector2 offset;
     public bool autoUpdate;
+    public bool useFallof;
+    float[, ] fallofMap;
     public TerrainType[] regions;
 
     Queue<MapThreadInfo<MapData>> mapDataThreadInfoQ = new Queue<MapThreadInfo<MapData>> ();
     Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQ = new Queue<MapThreadInfo<MeshData>> ();
+    void Awake () {
+        fallofMap = FallofGenerator.GenerateFallofMap (mapChunkSize);
+    }
     public void DrawnMapInEditor () {
         MapDisplay display = FindObjectOfType<MapDisplay> ();
         MapData mapdata = GenerateMapData (Vector2.zero);
@@ -105,6 +110,9 @@ public class MapGenerator : MonoBehaviour {
         Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
         for (int y = 0; y < mapChunkSize; y++) {
             for (int x = 0; x < mapChunkSize; x++) {
+                if (useFallof) {
+                    noiseMap[x, y] = Mathf.Clamp01 (noiseMap[x, y] - fallofMap[x, y]);
+                }
                 float currentHeight = noiseMap[x, y];
                 for (int i = 0; i < regions.Length; i++) {
                     if (currentHeight >= regions[i].height) {
@@ -118,7 +126,7 @@ public class MapGenerator : MonoBehaviour {
         return new MapData (noiseMap, colourMap);
     }
 
-    void onValidate () {
+    void OnValidate () {
 
         if (lacunarity < 1) {
             lacunarity = 1;
@@ -126,6 +134,9 @@ public class MapGenerator : MonoBehaviour {
         if (octaves < 0) {
             octaves = 0;
         }
+
+        fallofMap = FallofGenerator.GenerateFallofMap (mapChunkSize);
+
     }
 
     struct MapThreadInfo<T> {
